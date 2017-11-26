@@ -1,0 +1,42 @@
+composition
+
+import Fugue.System.Policy as .
+
+# Add your default account ID below. You can find this ID by executing
+# `fugue account list`.
+default: Account(accountId: "fugue-1510438824960")
+staging: Account(accountId: "staging-1510512404106")
+production: Account(accountId: "production-1510512474482")
+
+alice: User {userId: "alice"}
+bob: User {userId: "bob"}
+charlie: User {userId: "charlie"}
+david: User {userId: "david"}
+
+Process network: AliasedProcess {alias: "network"}
+
+aliceAdmin: accountRules {
+        principals: [alice],
+        accounts: [AllAccounts],
+        actions: allAccountActions}
+
+bobCanRunInStaging: accountRules {
+          principals: [bob],
+          accounts: [staging],
+          actions: [AccountRunProcess,
+            AccountStatusProcess,
+            AccountUpdateProcess,
+            AccountKillProcess]}
+
+bobCanListProduction: accountRules {
+          principals: [bob],
+          accounts: [production],
+          actions: [AccountStatusProcess]}
+
+charlieAcctTable: accountTableRules { principals: [charlie],
+                                    actions: allAccountTableActions }
+
+davidStatusNetwork: Rule {
+          principal: david,
+          subject: ProcessType(network),
+          action: ProcessAction(ProcessGetStatus)}
